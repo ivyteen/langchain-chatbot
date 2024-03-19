@@ -4,8 +4,8 @@ import streamlit as st
 
 #decorator
 def enable_chat_history(func):
-    if os.environ.get("OPENAI_API_KEY"):
-
+    #if os.environ.get("OPENAI_API_KEY"):
+    if True:
         # to clear chat history after swtching chatbot
         current_page = func.__qualname__
         if "current_page" not in st.session_state:
@@ -20,13 +20,48 @@ def enable_chat_history(func):
 
         # to show chat history on ui
         if "messages" not in st.session_state:
-            st.session_state["messages"] = [{"role": "assistant", "content": "How can I help you?"}]
+            st.session_state["messages"] = [{"role": "assistant", "content": "무엇을 도와드릴까요?"}]
         for msg in st.session_state["messages"]:
             st.chat_message(msg["role"]).write(msg["content"])
 
+    # async def execute(*args, **kwargs):
+    #     await func(*args, **kwargs)
     def execute(*args, **kwargs):
-        func(*args, **kwargs)
+        func(*args, **kwargs)        
     return execute
+
+
+#decorator
+def ws_enable_chat_history(func):
+
+    #if os.environ.get("OPENAI_API_KEY"):
+    #print("ws_enable_chat_history called")
+
+    if True:
+        # to clear chat history after swtching chatbot
+        current_page = func.__qualname__
+        if "current_page" not in st.session_state:
+            st.session_state["current_page"] = current_page
+        if st.session_state["current_page"] != current_page:
+            try:
+                st.cache_resource.clear()
+                del st.session_state["current_page"]
+                del st.session_state["messages"]
+            except:
+                pass
+
+        # to show chat history on ui
+        if "messages" not in st.session_state:
+            st.session_state["messages"] = [{"role": "assistant", "content": "무엇을 도와드릴까요?"}]
+        for msg in st.session_state["messages"]:
+            st.chat_message(msg["role"]).write(msg["content"])
+
+    # async def execute(*args, **kwargs):
+    #     await func(*args, **kwargs)
+    async def execute(*args, **kwargs):
+        await func(*args, **kwargs)        
+    return execute
+
 
 def display_msg(msg, author):
     """Method to display message on the UI
